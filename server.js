@@ -9,9 +9,9 @@ var blocked = require('./static/blocked.json');
 var reBlocked = require('./static/re_blocked.json');
 
 var port = process.env.PORT || 80;
-var subdomainsAsPath = true;
+var subdomainsAsPath = false;
 var serveHomepage = true;
-var serveHomepageOnAllSubdomains = true;
+var serveHomepageOnAllSubdomains = false;
 
 var httpsProxy = proxy.createProxyServer({
   agent: new https.Agent({

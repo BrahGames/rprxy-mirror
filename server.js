@@ -26,7 +26,7 @@ var httpProxy = proxy.createProxyServer({
   changeOrigin: true
 });
 
-function stripSub(link) {
+function stripSub (link) {
   var original = url.parse(link);
   var sub = '';
   var path = original.path;
@@ -39,7 +39,7 @@ function stripSub(link) {
   return [path || '/', sub];
 }
 
-function getSubdomain(req, rewrite) {
+function getSubdomain (req, rewrite) {
   var sub;
   if (subdomainsAsPath) {
     var res = stripSub(req.url);
@@ -54,15 +54,17 @@ function getSubdomain(req, rewrite) {
   return sub;
 }
 
-function onProxyError(err, req, res) {
-  console.error('Proxy error:', err);
+function onProxyError (err, req, res) {
+  console.error(err);
+
   res.writeHead(500, {
     'Content-Type': 'text/plain'
   });
+
   res.end('Proxying failed.');
 }
 
-function onProxyReq(proxyReq, req, res, options) {
+function onProxyReq (proxyReq, req, res, options) {
   proxyReq.setHeader('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36');
   proxyReq.removeHeader('roblox-id');
 }
@@ -106,13 +108,9 @@ app.use(function (req, res, next) {
 app.use(function (req, res, next) {
   console.log('PROXY REQUEST; HOST: ' + req.headers.host + '; URL: ' + req.url + '; OPT: ' + req.body + '; COOKIE: ' + req.headers.cookie + ';');
   var subdomain = getSubdomain(req, true);
-  console.log('Subdomain:', subdomain);
   var proto = subdomain === 'wiki.' ? 'http' : 'https';
-  var targetUrl = proto + '://' + (subdomain || 'www.') + 'roblox.com' + req.url;
-  console.log('Target URL:', targetUrl);
-
   var options = {
-    target: targetUrl
+    target: proto + '://' + (subdomain || 'www.') + 'roblox.com'
   };
   if (proto === 'https') {
     httpsProxy.web(req, res, options);
@@ -122,10 +120,12 @@ app.use(function (req, res, next) {
 });
 
 app.use(function (err, req, res, next) {
-  console.error('Handler error:', err);
+  console.error(err);
+
   res.writeHead(500, {
     'Content-Type': 'text/plain'
   });
+
   res.end('Proxy handler failed.');
 });
 
